@@ -3,38 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log Masuk - Halaqah Ustaz Arham</title>
+    <title>Rekod Tasmik - Tambah</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
         }
 
-        .login-container {
-            max-width: 400px;
-            width: 100%;
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
             padding: 20px;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
         }
 
+        /* Gaya Header */
         .header {
             background: linear-gradient(45deg, #4facfe, #00f2fe);
             color: white;
-            padding: 15px;
+            padding: 20px;
+            text-align: center;
             border-radius: 8px 8px 0 0;
-            font-size: 20px;
+            margin-bottom: 20px;
+            font-size: 24px;
             font-weight: bold;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
         }
 
         .form-group {
@@ -47,7 +50,7 @@
             font-weight: bold;
         }
 
-        input {
+        input, select, textarea {
             width: 100%;
             padding: 8px;
             border: 1px solid #ccc;
@@ -55,80 +58,156 @@
             box-sizing: border-box;
         }
 
+        textarea {
+            height: 100px;
+        }
+
         button {
-            background: linear-gradient(45deg, #28a745, #34d058);
+            background-color: #28a745;
             color: white;
             padding: 10px 15px;
             border: none;
-            border-radius: 25px;
+            border-radius: 4px;
             cursor: pointer;
             width: 100%;
             font-size: 16px;
-            font-weight: bold;
-            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         button:hover {
+            background-color: #218838;
+        }
+
+        /* Gaya Butang Senarai Rekod dan Log Keluar */
+        .senarai-btn, .logout-btn {
+            display: block;
+            background: linear-gradient(45deg, #007bff, #00d4ff);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .logout-btn {
+            background: linear-gradient(45deg, #dc3545, #ff6666);
+            margin-top: 20px;
+        }
+
+        .senarai-btn:hover, .logout-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         /* Responsif untuk HP */
         @media screen and (max-width: 600px) {
-            .login-container {
+            .container {
                 margin: 10px;
                 padding: 15px;
             }
 
             .header {
-                font-size: 16px;
-                padding: 10px;
+                font-size: 18px;
+                padding: 15px;
             }
 
-            button {
-                padding: 8px;
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .senarai-btn, .logout-btn {
+                padding: 10px;
                 font-size: 14px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
+    <div class="container">
         <div class="header">HALAQAH USTAZ ARHAM</div>
-        <h2>Log Masuk</h2>
-        <form id="loginForm">
+        <a href="senarai.html" class="senarai-btn">Senarai Rekod Tasmik</a>
+        <h1>Rekod Tasmik - Tambah</h1>
+        <form id="tasmikForm">
             <div class="form-group">
-                <label for="password">Kata Laluan:</label>
-                <input type="password" id="password" required>
+                <label for="nama">Nama Pelajar:</label>
+                <select id="nama" required>
+                    <option value="" disabled selected>Pilih Pelajar</option>
+                    <option value="Ahmad">Ahmad</option>
+                    <option value="Fatimah">Fatimah</option>
+                    <option value="Hassan">Hassan</option>
+                    <option value="Siti">Siti</option>
+                    <option value="Zubair">Zubair</option>
+                </select>
             </div>
-            <button type="submit">Log Masuk</button>
+            <div class="form-group">
+                <label for="juzuk">Juzuk:</label>
+                <input type="number" id="juzuk" min="1" max="30" required>
+            </div>
+            <div class="form-group">
+                <label for="ayat">Ayat:</label>
+                <input type="number" id="ayat" min="1" required>
+            </div>
+            <div class="form-group">
+                <label for="tarikh">Tarikh:</label>
+                <input type="date" id="tarikh" required>
+            </div>
+            <div class="form-group">
+                <label for="catatan">Catatan:</label>
+                <textarea id="catatan"></textarea>
+            </div>
+            <button type="submit">Simpan Rekod</button>
         </form>
+        <button class="logout-btn" onclick="logout()">Log Keluar</button>
     </div>
 
     <script>
-        // Senarai kata laluan yang sah
-        const validPasswords = ["Admin", "ustazarham", "tasmikselamat"];
-
-        // Jika sudah log masuk, arahkan terus ke index.html
-        if (localStorage.getItem('isLoggedIn') === 'true') {
-            window.location.href = 'index.html';
+        // Semak status log masuk
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
         }
 
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('tasmikForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const password = document.getElementById('password').value;
+            const nama = document.getElementById('nama').value;
+            const juzuk = parseInt(document.getElementById('juzuk').value);
+            const ayat = parseInt(document.getElementById('ayat').value);
+            const tarikh = document.getElementById('tarikh').value;
+            const catatan = document.getElementById('catatan').value;
 
-            // Semak sama ada kata laluan ada dalam senarai
-            if (validPasswords.includes(password)) {
-                // Simpan status log masuk dalam localStorage
-                localStorage.setItem('isLoggedIn', 'true');
-                // Alihkan ke index.html
-                window.location.href = 'index.html';
-            } else {
-                alert('Kata laluan salah. Sila cuba lagi.');
+            // Validasi input nombor positif
+            if (isNaN(juzuk) || juzuk < 1 || isNaN(ayat) || ayat < 1) {
+                alert('Sila masukkan nombor positif untuk Juzuk dan Ayat.');
+                return;
             }
+
+            const rekod = {
+                id: Date.now(),
+                nama,
+                juzuk,
+                ayat,
+                tarikh,
+                catatan
+            };
+
+            let rekodList = JSON.parse(localStorage.getItem('rekodTasmik')) || [];
+            rekodList.push(rekod);
+            localStorage.setItem('rekodTasmik', JSON.stringify(rekodList));
+
+            document.getElementById('tasmikForm').reset();
+            alert('Rekod berjaya disimpan!');
         });
+
+        function logout() {
+            // Padam status log masuk
+            localStorage.removeItem('isLoggedIn');
+            // Alihkan ke login.html
+            window.location.href = 'login.html';
+        }
     </script>
 </body>
 </html>
