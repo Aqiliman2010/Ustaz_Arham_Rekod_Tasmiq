@@ -106,16 +106,23 @@
     </div>
 
     <script>
-        const correctPassword = "ustazarham"; // Anda boleh ubah kata laluan ini
+        // Senarai kata laluan yang sah
+        const validPasswords = ["Admin", "ustazarham", "tasmikselamat"];
+
+        // Jika sudah log masuk, arahkan terus ke index.html
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            window.location.href = 'index.html';
+        }
 
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const password = document.getElementById('password').value;
 
-            if (password === correctPassword) {
-                // Simpan status log masuk dalam sessionStorage
-                sessionStorage.setItem('isLoggedIn', 'true');
+            // Semak sama ada kata laluan ada dalam senarai
+            if (validPasswords.includes(password)) {
+                // Simpan status log masuk dalam localStorage
+                localStorage.setItem('isLoggedIn', 'true');
                 // Alihkan ke index.html
                 window.location.href = 'index.html';
             } else {
