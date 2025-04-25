@@ -77,8 +77,8 @@
             background-color: #c82333;
         }
 
-        /* Gaya Butang Kembali ke Tambah Rekod, Kembali ke Senarai Pelajar, dan Backup */
-        .tambah-btn, .pelajar-btn, .backup-btn {
+        /* Gaya Butang Kembali ke Tambah Rekod, Kembali ke Senarai Pelajar, Backup, dan Log Keluar */
+        .tambah-btn, .pelajar-btn, .backup-btn, .logout-btn {
             display: block;
             background: linear-gradient(45deg, #28a745, #34d058);
             color: white;
@@ -94,7 +94,11 @@
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .tambah-btn:hover, .pelajar-btn:hover, .backup-btn:hover {
+        .logout-btn {
+            background: linear-gradient(45deg, #dc3545, #ff6666);
+        }
+
+        .tambah-btn:hover, .pelajar-btn:hover, .backup-btn:hover, .logout-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
@@ -115,7 +119,7 @@
                 font-size: 14px;
             }
 
-            .tambah-btn, .pelajar-btn, .backup-btn {
+            .tambah-btn, .pelajar-btn, .backup-btn, .logout-btn {
                 padding: 10px;
                 font-size: 14px;
             }
@@ -172,13 +176,16 @@
             <div class="pelajar-list" id="pelajarList"></div>
             <button class="backup-btn" onclick="backupAndShare()">Backup dan Share ke WhatsApp</button>
             <a href="index.html" class="tambah-btn">Kembali ke Tambah Rekod</a>
+            <button class="logout-btn" onclick="logout()">Log Keluar</button>
         </div>
-        <div id="rekodView" class="rekod-container"></div>
+        <div id="rekodView" class="rekod-container">
+            <!-- Butang Log Keluar akan ditambah secara dinamik dalam rekodView -->
+        </div>
     </div>
 
     <script>
         // Semak status log masuk
-        if (!sessionStorage.getItem('isLoggedIn')) {
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
             window.location.href = 'login.html';
         }
 
@@ -236,6 +243,7 @@
                     <tbody id="tasmikBody"></tbody>
                 </table>
                 <a href="index.html" class="tambah-btn">Kembali ke Tambah Rekod</a>
+                <button class="logout-btn" onclick="logout()">Log Keluar</button>
             `;
 
             // Saring rekod mengikut nama pelajar
@@ -290,9 +298,16 @@
             // Encode teks untuk URL
             const encodedMessage = encodeURIComponent(message);
 
-            // Guna pautan whatsapp://send untuk peranti mudah alih
-            const whatsappUrl = `whatsapp:/60182915842/send?text=${encodedMessage}`;
+            // Tetapkan nombor WhatsApp (pastikan nombor ini betul)
+            const whatsappUrl = `whatsapp://send?phone=60123456789&text=${encodedMessage}`;
             window.open(whatsappUrl, '_blank');
+        }
+
+        function logout() {
+            // Padam status log masuk
+            localStorage.removeItem('isLoggedIn');
+            // Alihkan ke login.html
+            window.location.href = 'login.html';
         }
 
         document.addEventListener('DOMContentLoaded', loadPelajar);
