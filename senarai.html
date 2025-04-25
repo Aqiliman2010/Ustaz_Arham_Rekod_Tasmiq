@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekod Tasmik - Senarai</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .pelajar-list {
+            margin-top: 20px;
+        }
+
+        .pelajar-item {
+            padding: 10px;
+            background: #f2f2f2;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .pelajar-item:hover {
+            background: #e0e0e0;
+        }
+
+        .rekod-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Gaya Butang Kembali ke Tambah Rekod, Kembali ke Senarai Pelajar, dan Backup */
+        .tambah-btn, .pelajar-btn, .backup-btn {
+            display: block;
+            background: linear-gradient(45deg, #28a745, #34d058);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .tambah-btn:hover, .pelajar-btn:hover, .backup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Responsif untuk HP */
+        @media screen and (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+
+            h1, h2 {
+                font-size: 1.5em;
+            }
+
+            .pelajar-item {
+                padding: 8px;
+                font-size: 14px;
+            }
+
+            .tambah-btn, .pelajar-btn, .backup-btn {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tr {
+                margin-bottom: 15px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                background: #f9f9f9;
+                padding: 10px;
+            }
+
+            td {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px;
+                border: none;
+                text-align: right;
+                position: relative;
+            }
+
+            td:before {
+                content: attr(data-label);
+                font-weight: bold;
+                text-align: left;
+                flex: 1;
+                color: #333;
+            }
+
+            td:last-child {
+                justify-content: center;
+            }
+
+            .delete-btn {
+                width: 100%;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="mainView">
+            <h1>Senarai Rekod Tasmik</h1>
+            <h2>Pilih Pelajar</h2>
+            <div class="pelajar-list" id="pelajarList"></div>
+            <button class="backup-btn" onclick="backupAndShare()">Backup dan Share ke WhatsApp</button>
+            <a href="index.html" class="tambah-btn">Kembali ke Tambah Rekod</a>
+        </div>
+        <div id="rekodView" class="rekod-container"></div>
+    </div>
+
+    <script>
+        // Semak status log masuk
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+
+        function loadPelajar() {
+            const rekodList = JSON.parse(localStorage.getItem('rekodTasmik')) || [];
+            const pelajarList = document.getElementById('pelajarList');
+            const mainView = document.getElementById('mainView');
+            const rekodView = document.getElementById('rekodView');
+            pelajarList.innerHTML = '';
+
+            // Dapatkan senarai unik pelajar
+            const pelajarUnik = [...new Set(rekodList.map(rekod => rekod.nama))];
+            
+            if (pelajarUnik.length === 0) {
+                pelajarList.innerHTML = '<p>Tiada pelajar didaftarkan.</p>';
+                return;
+            }
+
+            pelajarUnik.forEach(nama => {
+                const pelajarItem = document.createElement('div');
+                pelajarItem.className = 'pelajar-item';
+                pelajarItem.textContent = nama;
+                pelajarItem.addEventListener('click', () => showRekodByPelajar(nama));
+                pelajarList.appendChild(pelajarItem);
+            });
+
+            // Pastikan mainView ditunjukkan dan rekodView disembunyikan
+            mainView.style.display = 'block';
+            rekodView.style.display = 'none';
+        }
+
+        function showRekodByPelajar(nama) {
+            const rekodList = JSON.parse(localStorage.getItem('rekodTasmik')) || [];
+            const mainView = document.getElementById('mainView');
+            const rekodView = document.getElementById('rekodView');
+
+            // Sembunyikan mainView dan tunjukkan rekodView
+            mainView.style.display = 'none';
+            rekodView.style.display = 'block';
+
+            // Buat kandungan untuk rekod pelajar
+            rekodView.innerHTML = `
+                <a href="#" class="pelajar-btn" onclick="loadPelajar()">Kembali ke Senarai Pelajar</a>
+                <h2>Rekod Tasmik: ${nama}</h2>
+                <table id="tasmikTable">
+                    <thead>
+                        <tr>
+                            <th>Juzuk</th>
+                            <th>Ayat</th>
+                            <th>Tarikh</th>
+                            <th>Catatan</th>
+                            <th>Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tasmikBody"></tbody>
+                </table>
+                <a href="index.html" class="tambah-btn">Kembali ke Tambah Rekod</a>
+            `;
+
+            // Saring rekod mengikut nama pelajar
+            const rekodPelajar = rekodList.filter(rekod => rekod.nama === nama);
+            const tableBody = document.getElementById('tasmikBody');
+
+            if (rekodPelajar.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="5">Tiada rekod untuk pelajar ini.</td></tr>';
+                return;
+            }
+
+            rekodPelajar.forEach(rekod => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td data-label="Juzuk">${rekod.juzuk}</td>
+                    <td data-label="Ayat">${rekod.ayat}</td>
+                    <td data-label="Tarikh">${rekod.tarikh}</td>
+                    <td data-label="Catatan">${rekod.catatan || '-'}</td>
+                    <td data-label="Tindakan"><button class="delete-btn" onclick="deleteRekod(${rekod.id}, '${nama}')">Padam</button></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function deleteRekod(id, nama) {
+            let rekodList = JSON.parse(localStorage.getItem('rekodTasmik')) || [];
+            rekodList = rekodList.filter(rekod => rekod.id !== id);
+            localStorage.setItem('rekodTasmik', JSON.stringify(rekodList));
+            showRekodByPelajar(nama); // Muat semula rekod pelajar
+        }
+
+        function backupAndShare() {
+            const rekodList = JSON.parse(localStorage.getItem('rekodTasmik')) || [];
+            if (rekodList.length === 0) {
+                alert('Tiada rekod tasmik untuk di-backup.');
+                return;
+            }
+
+            // Susun data dalam format teks
+            let message = 'Backup Rekod Tasmik Halaqah Ustaz Arham\n\n';
+            const pelajarUnik = [...new Set(rekodList.map(rekod => rekod.nama))];
+
+            pelajarUnik.forEach(nama => {
+                message += `Pelajar: ${nama}\n`;
+                const rekodPelajar = rekodList.filter(rekod => rekod.nama === nama);
+                rekodPelajar.forEach(rekod => {
+                    message += `- Juzuk: ${rekod.juzuk}, Ayat: ${rekod.ayat}, Tarikh: ${rekod.tarikh}, Catatan: ${rekod.catatan || '-'}\n`;
+                });
+                message += '\n';
+            });
+
+            // Encode teks untuk URL
+            const encodedMessage = encodeURIComponent(message);
+
+            // Guna pautan whatsapp://send untuk peranti mudah alih
+            const whatsappUrl = `whatsapp:/60182915842/send?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        document.addEventListener('DOMContentLoaded', loadPelajar);
+    </script>
+</body>
+</html>
