@@ -106,8 +106,10 @@
     </div>
 
     <script>
-        // Senarai kata laluan yang sah
-        const validPasswords = ["Admin", "ustazarham", "tasmikselamat"];
+        // Muat senarai kata laluan dari localStorage
+        const validPasswords = JSON.parse(localStorage.getItem('validPasswords')) || [
+            "Developer", "ustazarham123", "tasmikselamat"
+        ];
 
         // Jika sudah log masuk, arahkan terus ke index.html
         if (localStorage.getItem('isLoggedIn') === 'true') {
