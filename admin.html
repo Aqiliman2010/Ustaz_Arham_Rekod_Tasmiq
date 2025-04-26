@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halaman Admin - Halaqah Ustaz Arham</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Gaya Header */
+        .header {
+            background: linear-gradient(45deg, #ff6f61, #ff9f80);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .header::before {
+            content: "🔒";
+            font-size: 30px;
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #ff6f61;
+            outline: none;
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff6f61, #ff9f80);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Gaya Butang Kembali dan Log Keluar */
+        .back-btn, .logout-btn {
+            display: block;
+            background: linear-gradient(45deg, #007bff, #00d4ff);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .logout-btn {
+            background: linear-gradient(45deg, #dc3545, #ff6666);
+        }
+
+        .back-btn:hover, .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Gaya Senarai Nama dan Kata Laluan */
+        .list-container {
+            margin-top: 10px;
+        }
+
+        .list-item {
+            padding: 10px;
+            background: #f2f2f2;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .list-item span {
+            color: #333;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Responsif untuk HP */
+        @media screen and (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+
+            .header {
+                font-size: 18px;
+                padding: 15px;
+            }
+
+            .header::before {
+                font-size: 24px;
+                left: 15px;
+            }
+
+            h1, h2 {
+                font-size: 1.5em;
+            }
+
+            .back-btn, .logout-btn, button {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .list-item {
+                font-size: 14px;
+                padding: 8px;
+            }
+
+            .delete-btn {
+                padding: 5px 8px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">HALAQAH USTAZ ARHAM - ADMIN</div>
+        <h1>Halaman Admin</h1>
+
+        <!-- Seksyen Edit Nama Pelajar -->
+        <div class="section">
+            <h2>Edit Nama Pelajar</h2>
+            <form id="editNamaForm">
+                <div class="form-group">
+                    <label for="namaBaru">Tambah Nama Pelajar Baru:</label>
+                    <input type="text" id="namaBaru" required>
+                </div>
+                <button type="submit">Tambah Nama</button>
+            </form>
+            <div class="list-container" id="namaList"></div>
+        </div>
+
+        <!-- Seksyen Tambah Kata Laluan -->
+        <div class="section">
+            <h2>Tambah Kata Laluan Log Masuk</h2>
+            <form id="tambahPasswordForm">
+                <div class="form-group">
+                    <label for="passwordBaru">Kata Laluan Baru:</label>
+                    <input type="text" id="passwordBaru" required>
+                </div>
+                <button type="submit">Tambah Kata Laluan</button>
+            </form>
+            <div class="list-container" id="passwordList"></div>
+        </div>
+
+        <a href="index.html" class="back-btn">Kembali ke Tambah Rekod</a>
+        <button class="logout-btn" onclick="logoutAdmin()">Log Keluar</button>
+    </div>
+
+    <script>
+        // Kata laluan khas untuk admin
+        const adminPassword = "AdminHalaqah";
+
+        // Semak status log masuk admin
+        if (localStorage.getItem('isAdminLoggedIn') !== 'true') {
+            const password = prompt("Sila masukkan kata laluan admin:");
+            if (password !== adminPassword) {
+                alert("Kata laluan salah. Anda tidak dibenarkan mengakses halaman ini.");
+                window.location.href = 'login.html';
+            } else {
+                localStorage.setItem('isAdminLoggedIn', 'true');
+            }
+        }
+
+        // Fungsi untuk log keluar admin
+        function logoutAdmin() {
+            localStorage.removeItem('isAdminLoggedIn');
+            window.location.href = 'login.html';
+        }
+
+        // Inisialisasi senarai nama pelajar dan kata laluan
+        let namaPelajarList = JSON.parse(localStorage.getItem('namaPelajarList')) || [
+            "Ahmad", "Fatimah", "Hassan", "Siti", "Zubair"
+        ];
+        let validPasswords = JSON.parse(localStorage.getItem('validPasswords')) || [
+            "halaqah2025", "ustazarham123", "tasmikselamat"
+        ];
+
+        // Fungsi untuk memaparkan senarai nama pelajar
+        function loadNamaList() {
+            const namaList = document.getElementById('namaList');
+            namaList.innerHTML = '';
+
+            namaPelajarList.forEach((nama, index) => {
+                const listItem = document.createElement('div');
+                listItem.className = 'list-item';
+                listItem.innerHTML = `
+                    <span>${nama}</span>
+                    <button class="delete-btn" onclick="deleteNama(${index})">Padam</button>
+                `;
+                namaList.appendChild(listItem);
+            });
+        }
+
+        // Fungsi untuk memaparkan senarai kata laluan
+        function loadPasswordList() {
+            const passwordList = document.getElementById('passwordList');
+            passwordList.innerHTML = '';
+
+            validPasswords.forEach((password, index) => {
+                const listItem = document.createElement('div');
+                listItem.className = 'list-item';
+                listItem.innerHTML = `
+                    <span>${password}</span>
+                    <button class="delete-btn" onclick="deletePassword(${index})">Padam</button>
+                `;
+                passwordList.appendChild(listItem);
+            });
+        }
+
+        // Tambah nama pelajar baru
+        document.getElementById('editNamaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const namaBaru = document.getElementById('namaBaru').value.trim();
+            if (namaBaru === '') {
+                alert('Sila masukkan nama pelajar.');
+                return;
+            }
+
+            if (namaPelajarList.includes(namaBaru)) {
+                alert('Nama pelajar ini sudah wujud.');
+                return;
+            }
+
+            namaPelajarList.push(namaBaru);
+            localStorage.setItem('namaPelajarList', JSON.stringify(namaPelajarList));
+            document.getElementById('editNamaForm').reset();
+            loadNamaList();
+            alert('Nama pelajar berjaya ditambah!');
+        });
+
+        // Padam nama pelajar
+        function deleteNama(index) {
+            if (confirm('Adakah anda pasti mahu memadam nama ini?')) {
+                namaPelajarList.splice(index, 1);
+                localStorage.setItem('namaPelajarList', JSON.stringify(namaPelajarList));
+                loadNamaList();
+            }
+        }
+
+        // Tambah kata laluan baru
+        document.getElementById('tambahPasswordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const passwordBaru = document.getElementById('passwordBaru').value.trim();
+            if (passwordBaru === '') {
+                alert('Sila masukkan kata laluan.');
+                return;
+            }
+
+            if (validPasswords.includes(passwordBaru)) {
+                alert('Kata laluan ini sudah wujud.');
+                return;
+            }
+
+            validPasswords.push(passwordBaru);
+            localStorage.setItem('validPasswords', JSON.stringify(validPasswords));
+            document.getElementById('tambahPasswordForm').reset();
+            loadPasswordList();
+            alert('Kata laluan berjaya ditambah!');
+        });
+
+        // Padam kata laluan
+        function deletePassword(index) {
+            if (confirm('Adakah anda pasti mahu memadam kata laluan ini?')) {
+                validPasswords.splice(index, 1);
+                localStorage.setItem('validPasswords', JSON.stringify(validPasswords));
+                loadPasswordList();
+            }
+        }
+
+        // Muat senarai semasa halaman dimuatkan
+        document.addEventListener('DOMContentLoaded', function() {
+            loadNamaList();
+            loadPasswordList();
+        });
+    </script>
+</body>
+</html>
