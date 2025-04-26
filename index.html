@@ -77,8 +77,8 @@
             background-color: #218838;
         }
 
-        /* Gaya Butang Senarai Rekod dan Log Keluar */
-        .senarai-btn, .logout-btn {
+        /* Gaya Butang Senarai Rekod, Admin, dan Log Keluar */
+        .senarai-btn, .admin-btn, .logout-btn {
             display: block;
             background: linear-gradient(45deg, #007bff, #00d4ff);
             color: white;
@@ -93,12 +93,16 @@
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
+        .admin-btn {
+            background: linear-gradient(45deg, #ff6f61, #ff9f80);
+        }
+
         .logout-btn {
             background: linear-gradient(45deg, #dc3545, #ff6666);
             margin-top: 20px;
         }
 
-        .senarai-btn:hover, .logout-btn:hover {
+        .senarai-btn:hover, .admin-btn:hover, .logout-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
@@ -119,7 +123,7 @@
                 font-size: 1.5em;
             }
 
-            .senarai-btn, .logout-btn {
+            .senarai-btn, .admin-btn, .logout-btn {
                 padding: 10px;
                 font-size: 14px;
             }
@@ -130,21 +134,13 @@
     <div class="container">
         <div class="header">HALAQAH USTAZ ARHAM</div>
         <a href="senarai.html" class="senarai-btn">Senarai Rekod Tasmik</a>
+        <a href="admin.html" class="admin-btn">Halaman Admin</a>
         <h1>Rekod Tasmik - Tambah</h1>
         <form id="tasmikForm">
             <div class="form-group">
                 <label for="nama">Nama Pelajar:</label>
                 <select id="nama" required>
-                    <option value="Muhammad Irfan Marwan">Muhammad Irfan Marwan</option>
-                    <option value="Zizie Asyraf">Zizie Asyraf</option>
-                    <option value="Aqil Iman">Aqil Iman</option>
-                    <option value="Amien">Amien Yasser</option>
-                    <option value="Ibad">Ibadurrahman</option>
-                    <option value="Luqman">Luqman Hakim</option>
-                    <option value="Wazif">Ahmad Wazif</option>
-                    <option value="Iskandar">Faris Iskandar</option>
-                    <option value="Widad">Atmam Widad</option>
-                    <option value="Fateh">Fateh Aimanullah</option>
+                    <option value="" disabled selected>Pilih Pelajar</option>
                 </select>
             </div>
             <div class="form-group">
@@ -173,6 +169,18 @@
         if (localStorage.getItem('isLoggedIn') !== 'true') {
             window.location.href = 'login.html';
         }
+
+        // Muat senarai nama pelajar dari localStorage
+        const namaPelajarList = JSON.parse(localStorage.getItem('namaPelajarList')) || [
+            "Ahmad", "Fatimah", "Hassan", "Siti", "Zubair"
+        ];
+        const namaSelect = document.getElementById('nama');
+        namaPelajarList.forEach(nama => {
+            const option = document.createElement('option');
+            option.value = nama;
+            option.textContent = nama;
+            namaSelect.appendChild(option);
+        });
 
         document.getElementById('tasmikForm').addEventListener('submit', function(e) {
             e.preventDefault();
